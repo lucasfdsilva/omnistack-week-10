@@ -45,7 +45,11 @@ module.exports = {
       if(!devDB){
         const apiResponse = await axios.get(`https://api.github.com/users/${github_username}`);
 
-        const { name = login, avatar_url, bio } = apiResponse.data;
+        let { name, login, avatar_url, bio } = apiResponse.data;
+
+        if(!name){
+          name = login;
+        }
 
         const techsArray = parseStringAsArray(techs);
 
@@ -63,15 +67,11 @@ module.exports = {
           location
         });
 
-        status = 200;
-        result = dev;
+        return res.status(200).json({ dev });
 
       } else{
-        status = 400;
-        result = { message: 'User already registered' };
+        return res.status(404).json({ message: 'User is already Registered' });
       }
-
-      return res.status(status).json({ result });
 
     } catch(err){
       return res.status(400).json({ error: err });
@@ -116,6 +116,8 @@ module.exports = {
       const { github_username } = req.body;
       let status, result;
 
+      console.log(req.body)
+
       const devDB = await Dev.findOne({ github_username });
 
       if(devDB){
@@ -125,6 +127,7 @@ module.exports = {
         result = { message: 'User Deleted Succesfully' };
         
       } else{
+        console.log('Delete: User Not Found')
         status = 404;
         result = { message: userNotFound() };
       }
