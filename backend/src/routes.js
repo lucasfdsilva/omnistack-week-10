@@ -6,7 +6,10 @@ const SearchController = require('./controllers/SearchController');
 const routes = Router();
 
 routes.get('/devs', DevController.index);
-routes.post('/devs', DevController.store); 
+routes.get('/devs/find', DevController.show);
+routes.post('/devs', DevController.store);
+routes.put('/devs', DevController.update);
+routes.delete('/devs', DevController.destroy); 
 
 routes.get('/search', SearchController.index);
   

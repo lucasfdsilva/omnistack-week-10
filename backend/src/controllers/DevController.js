@@ -1,17 +1,44 @@
 const axios = require('axios');
 const Dev = require('../models/Dev');
 const parseStringAsArray = require('../utils/parseStringAsArray');
+const userNotFound = require('../utils/userNotFound');
 
 module.exports = {
   async index(req, res){
-    const allExistingDevs = await Dev.find();
+    try{
+      const allExistingDevs = await Dev.find();
 
-    return res.json(allExistingDevs);
+      return res.status(200).json(allExistingDevs);
+
+    } catch(err){
+      return res.status(400).json({ error: err });
+    }
+  },
+
+  async show(req, res){
+    try{
+      const { github_username } = req.query;
+      let result;
+
+      const devDB = await Dev.findOne({ github_username });
+
+      result = devDB;
+
+      if(!devDB){
+        result = { message: userNotFound() };
+      }
+
+      return res.status(200).json({ result });    
+
+    } catch(err){
+      return res.status(400).json({ error: err });
+    }
   },
 
   async store(req, res) {
     try{
       const { github_username, techs, latitude, longitude } = req.body;
+      let status, result;
 
       const devDB = await Dev.findOne({ github_username });
     
@@ -36,11 +63,77 @@ module.exports = {
           location
         });
 
-        return res.json({ dev });
+        status = 200;
+        result = dev;
+
+      } else{
+        status = 400;
+        result = { message: 'User already registered' };
       }
+
+      return res.status(status).json({ result });
+
     } catch(err){
-      return res.jason({ error: err });
+      return res.status(400).json({ error: err });
     }
-  } 
+  },
+  
+  async update(req, res){
+    try{
+      const { github_username, name, avatar_url, bio, location, techs } = req.body;
+      let status, result;
+
+      const devDB = await Dev.findOne({ github_username });
+
+      if(devDB){
+        await Dev.updateOne(
+          { _id: devDB._id },
+          {
+            $set: { name, avatar_url, bio, location, techs }
+          }
+        );
+
+        const updatedDev = await Dev.findOne({ github_username });
+
+        console.log(updatedDev);
+        
+        status = 200;
+        result = { message: 'User Updated Succesfully', updatedDev };
+      } else{
+        status = 404;
+        result = { message: userNotFound() };
+      }
+
+      return res.status(status).json(result);
+  
+    } catch(err){
+      return res.status(400).json({ error: err });
+    }
+  },
+
+  async destroy(req, res){
+    try{
+      const { github_username } = req.body;
+      let status, result;
+
+      const devDB = await Dev.findOne({ github_username });
+
+      if(devDB){
+        await devDB.remove();
+
+        status = 200;
+        result = { message: 'User Deleted Succesfully' };
+        
+      } else{
+        status = 404;
+        result = { message: userNotFound() };
+      }
+
+      return res.status(status).json(result);
+
+    } catch(err){
+      return res.status(400).json({ error: err });
+    }
+  }
 
 };
