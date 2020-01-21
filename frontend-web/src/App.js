@@ -34,11 +34,9 @@ function App() {
     
     const response = await api.delete('/devs', { data: data });
 
-    await devs.forEach((dev) => {
-      if(dev.github_username == github_username){
-        setDevs(devs.splice(dev, 1));
-      }
-    });
+    const remainingDevs = await devs.filter((dev) => dev.github_username !== github_username);
+
+    setDevs(remainingDevs);
   }
 
   return (
