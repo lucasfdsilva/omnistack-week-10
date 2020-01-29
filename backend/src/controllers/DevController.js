@@ -98,7 +98,7 @@ module.exports = {
         console.log(updatedDev);
         
         status = 200;
-        result = { message: 'User Updated Succesfully', updatedDev };
+        result = { message: 'Sucess: User Updated Succesfully', updatedDev };
       } else{
         status = 404;
         result = { message: userNotFound() };
@@ -124,7 +124,7 @@ module.exports = {
         await devDB.remove();
 
         status = 200;
-        result = { message: 'User Deleted Succesfully' };
+        result = { message: 'Sucess: User Deleted Succesfully' };
         
       } else{
         console.log('Delete: User Not Found')
