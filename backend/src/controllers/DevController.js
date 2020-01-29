@@ -70,7 +70,7 @@ module.exports = {
         return res.status(200).json({ dev });
 
       } else{
-        return res.status(404).json({ message: 'User is already Registered' });
+        return res.status(404).json({ message: 'Error: User is already Registered' });
       }
 
     } catch(err){
