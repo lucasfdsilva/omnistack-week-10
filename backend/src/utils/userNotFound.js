@@ -1,3 +1,3 @@
 module.exports = function userNotFound(){
-  return 'Error: Could not locate user with this Github username';
+  return 'Could not locate user with this Github username';
 }
